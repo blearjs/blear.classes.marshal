@@ -1,0 +1,43 @@
+{
+  "name": "blear.utils.marshal",
+  "version": "1.0.0",
+  "description": "数据清洗过滤插件",
+  "scripts": {
+  },
+  "preferGlobal": false,
+  "bin": {},
+  "engines": {
+    "node": ">=1.0.0",
+    "iojs": ">=1.0.0"
+  },
+  "main": "src/index.js",
+  "keywords": [
+    "blear",
+    "node",
+    "template",
+    "express",
+    "marshal",
+    "zxs"
+  ],
+  "author": {
+    "name": "zhengxiansen",
+    "email": "zhengxiansen1993@gmail.com",
+    "url": ""
+  },
+  "contributors": [],
+  "homepage": "https://github.com/blearjs/blear.utils.marshal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blearjs/blear.utils.marshal"
+  },
+  "bugs": {
+    "url": "https://github.com/blearjs/blear.utils.marshal/issues"
+  },
+  "dependencies": {},
+  "peerDependencies": {},
+  "devDependencies": {
+    "blear.classes.class": "^1.0.6",
+    "blear.utils.typeis": "^1.0.2"
+  },
+  "license": "MIT"
+}
