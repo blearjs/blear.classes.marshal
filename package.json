@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "数据清洗过滤插件",
   "scripts": {
+    "test-travis": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly",
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
+    "prepublish": "npm test"
   },
   "preferGlobal": false,
   "bin": {},
@@ -13,9 +16,7 @@
   "main": "src/index.js",
   "keywords": [
     "blear",
-    "node",
-    "template",
-    "express",
+    "classes",
     "marshal",
     "zxs"
   ],
@@ -34,10 +35,14 @@
     "url": "https://github.com/blearjs/blear.classes.marshal/issues"
   },
   "dependencies": {},
-  "peerDependencies": {},
+  "peerDependencies": {
+    "blear.classes.class": "1.x",
+    "blear.utils.typeis": "1.x"
+  },
   "devDependencies": {
-    "blear.classes.class": "^1.0.6",
-    "blear.utils.typeis": "^1.0.2"
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.3",
+    "mocha": "^2.4.5"
   },
   "license": "MIT"
 }

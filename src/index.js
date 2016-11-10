@@ -10,155 +10,11 @@ var typeis = require('blear.utils.typeis');
 
 
 /**
- * 原始数据
- * @constructor
+ * Marshal.Raw = ...
+ * Marshal.String = ...
+ * module.exports = Marshal
  */
-var Raw = exports.Raw = Class.extend({
-    /**
-     * 构造函数
-     * @param defaults
-     * @param attribute
-     */
-    constructor: function (defaults, attribute) {
-        Raw.parent(this);
-        //noinspection JSUnresolvedVariable
-        this.defaults = defaults;
-        this.attribute = attribute;
-    },
 
-    output: function (key, obj) {
-        // 获取值
-        var value = _get_value(this.attribute ? this.attribute : key, obj);
-
-        // 因为有些时候是需要null的，所以不能全部改成默认值
-        if (typeof value === 'undefined')
-            value = this.defaults;
-
-        return this.format(value)
-    },
-
-    format: function (value) {
-        return value;
-    }
-});
-
-
-/**
- * 字符型数据
- * @constructor
- */
-exports.String = _make_meta_cls(function (value) {
-    try {
-        return (value || '') + '';
-
-    } catch (ex) {
-
-        MarshallingException(ex);
-    }
-});
-
-
-/**
- * 整数型数据
- * @constructor
- */
-exports.Integer = _make_meta_cls(function (value) {
-    try {
-        // 转成数字
-        value = parseInt(value + 0);
-
-        // 判断是否非数字
-        if (isNaN(value)) {
-            return 0;
-        }
-        return value
-
-    } catch (ex) {
-        MarshallingException(ex)
-    }
-});
-
-
-/**
- * 浮点型数据
- * @constructor
- */
-exports.Float = _make_meta_cls(function (value) {
-    try {
-        // 转成数字
-        value = parseFloat(value + 0);
-
-        // 判断是否非数字
-        if (isNaN(value)) {
-            return .0;
-        }
-        return value
-
-    } catch (ex) {
-        MarshallingException(ex)
-    }
-});
-
-
-/**
- * 布尔型数据
- * @constructor
- */
-exports.Boolean = _make_meta_cls(function (value) {
-    return Boolean(value);
-});
-
-
-/**
- * 数组型数据
- * @constructor
- */
-exports.Array = _make_meta_cls(function (value) {
-    if(typeis.Array(value))
-        return value;
-
-    return [];
-});
-
-
-/**
- * 对象数据
- * @constructor
- */
-exports.Object = _make_meta_cls(function (value) {
-    if(typeis.Object(value))
-        return value;
-
-    return {};
-});
-
-
-/**
- * 日期时间型数据
- * @constructor
- */
-var DateTime = exports.DateTime = Raw.extend({
-    constructor: function (defaults, attribute) {
-        DateTime.parent(this, defaults, attribute);
-    },
-    format: function (value) {
-        // todo: 后续实现
-    }
-});
-
-
-/**
- * 格式化字符串
- * @constructor
- */
-var FormattedString = exports.FormattedString = Raw.extend({
-    constructor: function (defaults, attribute) {
-        FormattedString.parent(this, defaults, attribute);
-    },
-    format: function (value) {
-        // todo: 后续实现
-    }
-});
 
 
 /**
@@ -168,7 +24,7 @@ var FormattedString = exports.FormattedString = Raw.extend({
  * @param opts {Object} 可选项 keys: envelope, force
  * @returns {*|Object|Array|JSON}
  */
-var marshal = exports.marshal = function (data, fields, opts) {
+var Marshal = module.exports = function (data, fields, opts) {
     var items, value, field, meta, json;
 
     // 可选项
@@ -206,7 +62,7 @@ var marshal = exports.marshal = function (data, fields, opts) {
                     // 如果是对象或数组
                     if (typeis.Object(json) || typeis.Array(json)) {
                         // 递归获取内容
-                        items[field] = marshal(json, value);
+                        items[field] = Marshal(json, value);
 
                     } else {
 
@@ -225,6 +81,160 @@ var marshal = exports.marshal = function (data, fields, opts) {
 
     return opts['envelope'] ? _make_object(opts['envelope'], items) : items;
 };
+
+
+
+/**
+ * 原始数据
+ * @constructor
+ */
+var Raw = Marshal.Raw = Class.extend({
+    /**
+     * 构造函数
+     * @param defaults
+     * @param attribute
+     */
+    constructor: function (defaults, attribute) {
+        Raw.parent(this);
+        //noinspection JSUnresolvedVariable
+        this.defaults = defaults;
+        this.attribute = attribute;
+    },
+
+    output: function (key, obj) {
+        // 获取值
+        var value = _get_value(this.attribute ? this.attribute : key, obj);
+
+        // 因为有些时候是需要null的，所以不能全部改成默认值
+        if (typeof value === 'undefined')
+            value = this.defaults;
+
+        return this.format(value)
+    },
+
+    format: function (value) {
+        return value;
+    }
+});
+
+
+/**
+ * 字符型数据
+ * @constructor
+ */
+Marshal.String = _make_meta_cls(function (value) {
+    try {
+        return (value || '') + '';
+
+    } catch (ex) {
+
+        MarshallingException(ex);
+    }
+});
+
+
+/**
+ * 整数型数据
+ * @constructor
+ */
+Marshal.Integer = _make_meta_cls(function (value) {
+    try {
+        // 转成数字
+        value = parseInt(value + 0);
+
+        // 判断是否非数字
+        if (isNaN(value)) {
+            return 0;
+        }
+        return value
+
+    } catch (ex) {
+        MarshallingException(ex)
+    }
+});
+
+
+/**
+ * 浮点型数据
+ * @constructor
+ */
+Marshal.Float = _make_meta_cls(function (value) {
+    try {
+        // 转成数字
+        value = parseFloat(value + 0);
+
+        // 判断是否非数字
+        if (isNaN(value)) {
+            return .0;
+        }
+        return value
+
+    } catch (ex) {
+        MarshallingException(ex)
+    }
+});
+
+
+/**
+ * 布尔型数据
+ * @constructor
+ */
+Marshal.Boolean = _make_meta_cls(function (value) {
+    return Boolean(value);
+});
+
+
+/**
+ * 数组型数据
+ * @constructor
+ */
+Marshal.Array = _make_meta_cls(function (value) {
+    if(typeis.Array(value))
+        return value;
+
+    return [];
+});
+
+
+/**
+ * 对象数据
+ * @constructor
+ */
+Marshal.Object = _make_meta_cls(function (value) {
+    if(typeis.Object(value))
+        return value;
+
+    return {};
+});
+
+
+/**
+ * 日期时间型数据
+ * @constructor
+ */
+var DateTime = Marshal.DateTime = Raw.extend({
+    constructor: function (defaults, attribute) {
+        DateTime.parent(this, defaults, attribute);
+    },
+    format: function (value) {
+        // todo: 后续实现
+    }
+});
+
+
+/**
+ * 格式化字符串
+ * @constructor
+ */
+var FormattedString = Marshal.FormattedString = Raw.extend({
+    constructor: function (defaults, attribute) {
+        FormattedString.parent(this, defaults, attribute);
+    },
+    format: function (value) {
+        // todo: 后续实现
+    }
+});
+
 
 /**
  * 创建元数据处理器
@@ -283,7 +293,7 @@ function _make_object(envelope, data) {
  */
 function _make_array(data, fields) {
     return data.map(function (value) {
-        return marshal(value, fields);
+        return Marshal(value, fields);
     });
 }
 
