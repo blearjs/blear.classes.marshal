@@ -220,9 +220,9 @@ var DateTime = Marshal.DateTime = Raw.extend({
  * 格式化字符串
  * @constructor
  */
-Marshal.FormattedString = Raw.extend({
+var FormattedString = Marshal.FormattedString = Raw.extend({
     constructor: function (defaults, attribute) {
-        Raw.parent(this, defaults, attribute);
+        FormattedString.parent(this, defaults, attribute);
     },
     format: function (value) {
         // todo: 后续实现
