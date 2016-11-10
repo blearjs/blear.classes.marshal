@@ -10,19 +10,11 @@ var typeis = require('blear.utils.typeis');
 
 
 /**
- * Marshal.Raw = ...
- * Marshal.String = ...
- * module.exports = Marshal
- */
-
-
-
-/**
  * 对外公开的API
  * @param data {*|Object|Array}
  * @param fields {Object} 字段列表
  * @param opts {Object} 可选项 keys: envelope, force
- * @returns {*|Object|Array|JSON}
+ * @returns {null|Object|Array|JSON}
  */
 var Marshal = module.exports = function (data, fields, opts) {
     var items, value, field, meta, json;
@@ -36,7 +28,7 @@ var Marshal = module.exports = function (data, fields, opts) {
         items = _make_array(data, fields);
 
     } else if (typeis.Object(data)) {
-        //
+        // 生成对象
         items = {};
 
         // 遍历字段
@@ -79,9 +71,9 @@ var Marshal = module.exports = function (data, fields, opts) {
         return null;
     }
 
+    // 是否需要包裹数据
     return opts['envelope'] ? _make_object(opts['envelope'], items) : items;
 };
-
 
 
 /**
@@ -95,7 +87,9 @@ var Raw = Marshal.Raw = Class.extend({
      * @param attribute
      */
     constructor: function (defaults, attribute) {
+        // 初始化父类
         Raw.parent(this);
+
         //noinspection JSUnresolvedVariable
         this.defaults = defaults;
         this.attribute = attribute;
@@ -189,7 +183,7 @@ Marshal.Boolean = _make_meta_cls(function (value) {
  * @constructor
  */
 Marshal.Array = _make_meta_cls(function (value) {
-    if(typeis.Array(value))
+    if (typeis.Array(value))
         return value;
 
     return [];
@@ -201,7 +195,7 @@ Marshal.Array = _make_meta_cls(function (value) {
  * @constructor
  */
 Marshal.Object = _make_meta_cls(function (value) {
-    if(typeis.Object(value))
+    if (typeis.Object(value))
         return value;
 
     return {};
@@ -226,9 +220,9 @@ var DateTime = Marshal.DateTime = Raw.extend({
  * 格式化字符串
  * @constructor
  */
-var FormattedString = Marshal.FormattedString = Raw.extend({
+Marshal.FormattedString = Raw.extend({
     constructor: function (defaults, attribute) {
-        FormattedString.parent(this, defaults, attribute);
+        Raw.parent(this, defaults, attribute);
     },
     format: function (value) {
         // todo: 后续实现
@@ -245,10 +239,15 @@ var FormattedString = Marshal.FormattedString = Raw.extend({
 function _make_meta_handle(cls) {
     if (typeis.Function(cls)) {
         // es6写法的函数没有prototype 囧~~~
-        if (cls.prototype && typeof typeis.Function(cls.prototype.output))
+        if (cls.prototype && typeis.Function(cls.prototype.output))
             return new cls();
 
-        return new _make_meta_cls(cls);
+        // 转义下
+        return {
+            output: function (key, obj) {
+                return cls(_get_value(key, obj))
+            }
+        };
     }
 
     return cls
