@@ -1,4 +1,4 @@
-# blear.utils.marshal
+# blear.classes.marshal
 
 [![npm module][npm-img]][npm-url]
 [![build status][travis-img]][travis-url]
