@@ -20,7 +20,7 @@ var fields = {
 var data = {
     "title": "11月1日起天天发：西安、腾冲、瑞丽双飞六日780元（全包。价格根据季节有上浮）",
     "cover": "http://img.lv-guanjia.com/2016092918014501pptkwh.jpg",
-    "days": 6,
+    "days": 6
 };
 
 // 整理数据

@@ -4,7 +4,7 @@
   "description": "数据清洗过滤插件",
   "scripts": {
     "test-travis": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly",
-    "test": "./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha",
+    "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha",
     "prepublish": "npm test"
   },
   "preferGlobal": false,
@@ -28,10 +28,10 @@
   "contributors": [],
   "homepage": "https://github.com/blearjs/blear.classes.marshal",
   "repository": {
-    "type": "git",
+
+  "bugs": { "type": "git",
     "url": "https://github.com/blearjs/blear.classes.marshal"
   },
-  "bugs": {
     "url": "https://github.com/blearjs/blear.classes.marshal/issues"
   },
   "dependencies": {},

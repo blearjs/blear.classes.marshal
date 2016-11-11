@@ -117,13 +117,10 @@ var Raw = Marshal.Raw = Class.extend({
  * @constructor
  */
 Marshal.String = _make_meta_cls(function (value) {
-    try {
-        return (value || '') + '';
+    if (typeis.String(value))
+        return value;
 
-    } catch (ex) {
-
-        MarshallingException(ex);
-    }
+    return value + '';
 });
 
 
@@ -132,19 +129,18 @@ Marshal.String = _make_meta_cls(function (value) {
  * @constructor
  */
 Marshal.Integer = _make_meta_cls(function (value) {
-    try {
-        // 转成数字
-        value = parseInt(value + 0);
+    // 如果是数字
+    if (typeis.Number(value))
+        return parseInt(value, 10);
 
-        // 判断是否非数字
-        if (isNaN(value)) {
-            return 0;
-        }
-        return value
+    // 转成数字
+    value = parseInt(value, 10);
 
-    } catch (ex) {
-        MarshallingException(ex)
+    // 判断是否非数字
+    if (isNaN(value)) {
+        return 0;
     }
+    return value;
 });
 
 
@@ -153,19 +149,19 @@ Marshal.Integer = _make_meta_cls(function (value) {
  * @constructor
  */
 Marshal.Float = _make_meta_cls(function (value) {
-    try {
-        // 转成数字
-        value = parseFloat(value + 0);
+    // 如果是数字
+    if (typeis.Number(value))
+        return value;
 
-        // 判断是否非数字
-        if (isNaN(value)) {
-            return .0;
-        }
-        return value
+    // 转成数字
+    value = parseFloat(value);
 
-    } catch (ex) {
-        MarshallingException(ex)
+    // 判断是否非数字
+    if (isNaN(value)) {
+        return .0;
     }
+
+    return value
 });
 
 
@@ -174,6 +170,10 @@ Marshal.Float = _make_meta_cls(function (value) {
  * @constructor
  */
 Marshal.Boolean = _make_meta_cls(function (value) {
+    // 如果是数字
+    if (typeis.Boolean(value))
+        return value;
+
     return Boolean(value);
 });
 
@@ -340,18 +340,4 @@ function _get_value_for_key(key, obj) {
     } catch (ex) {
         // pass
     }
-}
-
-/**
- * 解析异常类
- * @param Exception
- * @constructor
- */
-function MarshallingException(Exception) {
-    if (!(this instanceof MarshallingException)) {
-        return new MarshallingException(Exception);
-    }
-
-    // todo: 需要抛出异常吗？
-    throw Exception;
 }
