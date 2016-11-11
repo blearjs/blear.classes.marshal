@@ -17,7 +17,7 @@ var typeis = require('blear.utils.typeis');
  * @returns {null|Object|Array|JSON}
  */
 var Marshal = module.exports = function (data, fields, opts) {
-    var items, value, field, meta, json;
+    var items, field, meta, obj;
 
     // 可选项
     opts = opts || {};
@@ -35,26 +35,26 @@ var Marshal = module.exports = function (data, fields, opts) {
         for (field in fields) {
             if (fields.hasOwnProperty(field)) {
                 // 获取子项目
-                value = fields[field];
+                meta = fields[field];
 
                 // 如果value是元数据处理器或者是一个函数
-                if (value instanceof Raw || typeis.Function(value)) {
+                if (meta instanceof Raw || typeis.Function(meta)) {
 
                     // 获取元信息
-                    meta = _make_meta_handle(value);
+                    meta = _make_meta_handle(meta);
 
                     // 写入内容
                     items[field] = meta.output(field, data);
 
                     // 如果还有子项目需要递归
-                } else if (typeis.Object(value)) {
-                    // 获取当当前数据的
-                    json = data[field];
+                } else if (typeis.Object(meta)) {
+                    // 获取当前数据的
+                    obj = data[field];
 
                     // 如果是对象或数组
-                    if (typeis.Object(json) || typeis.Array(json)) {
+                    if (typeis.Object(obj) || typeis.Array(obj)) {
                         // 递归获取内容
-                        items[field] = Marshal(json, value);
+                        items[field] = Marshal(obj, meta);
 
                     } else {
 
@@ -63,7 +63,7 @@ var Marshal = module.exports = function (data, fields, opts) {
 
                     // 其他类型就当做固定数据
                 } else {
-                    items[field] = value;
+                    items[field] = meta;
                 }
             }
         }
@@ -76,10 +76,7 @@ var Marshal = module.exports = function (data, fields, opts) {
 };
 
 
-/**
- * 原始数据
- * @constructor
- */
+// 原始数据
 var Raw = Marshal.Raw = Class.extend({
     /**
      * 构造函数
@@ -93,23 +90,39 @@ var Raw = Marshal.Raw = Class.extend({
         //noinspection JSUnresolvedVariable
         this.defaults = defaults;
         this.attribute = attribute;
-    },
-
-    output: function (key, obj) {
-        // 获取值
-        var value = _get_value(this.attribute ? this.attribute : key, obj);
-
-        // 因为有些时候是需要null的，所以不能全部改成默认值
-        if (typeof value === 'undefined')
-            value = this.defaults;
-
-        return this.format(value)
-    },
-
-    format: function (value) {
-        return value;
     }
 });
+
+/**
+ * 输出值
+ * @param key
+ * @param obj
+ */
+Raw.prototype.output = function (key, obj) {
+    // 获取值
+    var value = _get_value(this.attribute ? this.attribute : key, obj);
+
+    // 如果value是ndefined的就返回默认值
+    // 因为有些情况下可能会需要null
+    // 所以不能用 ! 来判断
+    // 默认值不需要判断
+    // 因为value是undefined的话
+    // 在判断默认值是没有意义的
+    if (typeis.Undefined(value))
+        value = this.defaults;
+
+    // 传递给子类进行最终格式化处理
+    return this.format(value)
+};
+
+/**
+ * 格式化数据
+ * @param value
+ * @returns {*}
+ */
+Raw.prototype.format = function (value) {
+    return value;
+};
 
 
 /**
@@ -120,7 +133,7 @@ Marshal.String = _make_meta_cls(function (value) {
     if (typeis.String(value))
         return value;
 
-    return value + '';
+    return (value || '') + '';
 });
 
 
@@ -129,14 +142,14 @@ Marshal.String = _make_meta_cls(function (value) {
  * @constructor
  */
 Marshal.Integer = _make_meta_cls(function (value) {
-    // 如果是数字
     if (typeis.Number(value))
-        return parseInt(value, 10);
+        return value;
 
-    // 转成数字
+    if (!value)
+        return 0
+
     value = parseInt(value, 10);
 
-    // 判断是否非数字
     if (isNaN(value)) {
         return 0;
     }
@@ -149,14 +162,14 @@ Marshal.Integer = _make_meta_cls(function (value) {
  * @constructor
  */
 Marshal.Float = _make_meta_cls(function (value) {
-    // 如果是数字
     if (typeis.Number(value))
         return value;
 
-    // 转成数字
+    if (!value)
+        return 0
+
     value = parseFloat(value);
 
-    // 判断是否非数字
     if (isNaN(value)) {
         return .0;
     }
@@ -170,7 +183,6 @@ Marshal.Float = _make_meta_cls(function (value) {
  * @constructor
  */
 Marshal.Boolean = _make_meta_cls(function (value) {
-    // 如果是数字
     if (typeis.Boolean(value))
         return value;
 
